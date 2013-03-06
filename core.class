@@ -1,0 +1,328 @@
+package DummyMiner;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+
+import weka.core.Instances;
+
+public class core {
+  
+	static String path;	
+	
+	static Instances data;
+	static Instances data_1;//these 3 temp dataset is
+	static Instances data_2;//for save dataset processed
+	static Instances data_3;//by 3 different attribute eval algorithm 
+	
+	static boolean ifload = new Boolean(false);
+	static boolean ifoptimize = new Boolean(false);
+	static boolean ifselect = new Boolean(false);
+	static boolean ifreqremove = new Boolean(false);
+	
+	public static void main(String[] args) throws Exception {
+		
+		header();
+		System.out.println("");
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		
+		String code = br.readLine();
+		
+
+		
+		while (code != "0") {
+			switch (code) {
+				case "1":
+				
+					System.out.println("Please enter the path of your csv file");
+				
+
+					path = br.readLine();
+
+					
+					csv_arff.convert(path);
+				
+					
+
+					
+					
+					break;
+		
+					
+					
+					
+					
+				case "2":
+					
+					System.out.println("Please enter the path of your FOLDER for folder \"pos\" and \"neg\"");
+					
+
+					path = br.readLine();
+
+					
+					txt_arff.createDataset(path);
+					
+					break;
+					
+				    
+					
+					
+					
+				case "3":
+					System.out.println("Please enter the path of your arff dataset");
+					
+
+					path = br.readLine();
+					
+					BufferedReader br_data = new BufferedReader(new FileReader(path));
+					
+				    data = new Instances(br_data);
+				    data.setClassIndex(data.numAttributes() - 1);
+				    ifload = true;
+				    
+					System.out.println("Data seccussfully loaded, please optimize parameter before perform classifiers");
+				    
+				    break;
+				    
+				    
+				    
+				    
+				    
+				case "4":
+					
+					if (ifload) {
+						
+						if (!ifoptimize) {
+							
+							para_optimizer.para_optimize(data);
+							ifoptimize = true;
+						
+						}	else {
+							
+							System.out.println("your data has already been optimized");
+							
+						}
+						
+					} else {
+						
+						System.out.println("Please load your dataset first");
+					}
+					
+					break;
+					
+					
+					
+					
+					
+				case "5":
+					
+					if (ifload) {
+						
+						
+						if (!ifselect) {
+						
+							data_1 = feature_select.CfsSubsetEval(data);
+							System.out.println("");
+							System.out.println("");
+							System.out.println("");
+							data_2 = feature_select.ChiSquaredAttrEval(data_2);
+							System.out.println("");
+							System.out.println("");
+							System.out.println("");
+							data_3 = feature_select.GainRatioAttrEval(data_3);
+							System.out.println("");
+							System.out.println("");
+							System.out.println("");
+							
+							System.out.println("Select the algorithm you would apply on your dataset");
+							System.out.println("1- Cfs");
+							System.out.println("2 - ChiSquared");
+							System.out.println("3 - GainRatio");
+							System.out.println("other - Cancel");
+						
+						
+							System.out.println("");
+
+
+							String fs = br.readLine();
+
+						
+							switch (fs) {
+								case "1":
+									
+									data = data_1;
+									
+
+									System.out.println("\napplied cfs\n");
+								
+									break;
+							
+									
+								case "2":
+									
+									data = data_2;
+								
+									
+									
+									System.out.println("please enter how many attributes you want to remove");
+									
+									br = new BufferedReader(new InputStreamReader(System.in));
+										
+									int remove2 = br.read();
+										
+
+										
+										
+									feature_select.remove_attribute(data, remove2);
+										
+									System.out.println("\napplied chisquared\n");
+								
+										
+									break;
+
+									
+								case "3":
+									
+									data = data_3;
+								
+									System.out.println("please enter how many attributes you want to remove");
+									
+			
+									int remove3 = br.read();
+									
+									
+									
+									
+									
+									feature_select.remove_attribute(data, remove3);
+									
+									System.out.println("\napplied gainratio\n");
+									
+									
+									break;
+								
+									
+								default:
+								
+									
+									
+									break;
+							
+						
+							}
+						
+							
+							ifselect = true;
+						
+						
+						}	else {
+							
+							System.out.println("your data has already been selected");
+							
+						}
+						
+						
+						
+						
+					} else {
+						
+						System.out.println("Please load your dataset first");
+					}
+					
+					
+					break;
+					
+					
+					
+					
+					
+				case "6":
+				
+					
+					if (ifoptimize){
+					
+						model_perform.perform_NaiveBayes(data);
+					
+						model_perform.perform_J48(data,para_optimizer.para_J48);
+					
+						model_perform.perform_SMO(data,para_optimizer.para_SMO1);
+					
+						model_perform.perform_IBk(data,para_optimizer.para_IBk);
+					
+						model_perform.perform_JRip(data,para_optimizer.para_JRip);
+					
+					} else {
+						
+						System.out.println("Please optimize your algorithm parameter first");
+						
+					}
+						
+				
+					break;
+				
+					
+				case "?":
+					
+					header();
+					
+					break;
+					
+				case "0":
+					
+					System.exit(0);
+					
+					break;
+					
+				
+				default:
+					
+					
+					break;
+						
+
+					
+			}
+			
+			
+			
+
+			System.out.println("Please enter code， enter ? for information");
+
+			BufferedReader brkeep = new BufferedReader(new InputStreamReader(System.in));
+			
+			code = br.readLine();
+			
+
+			
+		
+		
+		}
+
+		
+
+		
+		
+	}
+	
+	
+	public static void header() { 
+		
+		
+		System.out.println("DummyMiner 0.1 for Web Mining Assignment 2");
+		System.out.println("Code by Wei Han");
+		System.out.println("");
+		System.out.println("enter code to implement:");
+
+		System.out.println("1 - csv to arff converter");
+		System.out.println("2 - txt to arff converter");
+		System.out.println("3 - load data");
+		System.out.println("4 - parameter optimizer");
+		System.out.println("5 - feature selection");
+		System.out.println("6 - classifier implementation");
+		System.out.println("0 - exit");
+		System.out.println("");
+		
+	}
+	
+}
